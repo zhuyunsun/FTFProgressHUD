@@ -8,7 +8,11 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
-
+UIKIT_STATIC_INLINE NSString* FTFProgressHUDSDKVersion(){
+    NSString *FTFProgressHUDSDKVersionStr = @"1.0.0";
+    NSLog(@"FTFProgressHUDSDKVersion:12.31 = %@",FTFProgressHUDSDKVersionStr);
+    return FTFProgressHUDSDKVersionStr;
+}
 
 typedef NS_ENUM(NSUInteger,FTFHUDStyle){
     FTFHUDStyleDefault = 1,

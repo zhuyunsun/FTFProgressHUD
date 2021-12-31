@@ -70,6 +70,7 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
 }
 
 +(instancetype)showHudInView:(UIView *)view mode:(FTFHUDStyle)mode{
+    FTFProgressHUDSDKVersion();
     FTFMainThreadAssert();
     FTFProgressHUD *hud = [[FTFProgressHUD alloc]initWithView:view mode:mode];
     hud.alpha = 0.01;
