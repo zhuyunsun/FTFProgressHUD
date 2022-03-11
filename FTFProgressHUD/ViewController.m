@@ -35,7 +35,7 @@
 //    [self.view addSubview:mainView];
     
     
-    dataSource = @[@"默认样式",@"3个白点样式",@"四方球样式",@"闪烁样式"];
+    dataSource = @[@"默认样式",@"3个白点样式",@"四方球样式",@"闪烁样式",@"圆1"];
     
     
     myTableView = [[UITableView alloc]init];
@@ -63,7 +63,10 @@
     if (code == 3) {
         [FTFProgressHUD showHudInView:mainView mode:FTFHUDStyleBlink];
     }
-    
+    if (code == 4) {
+        [FTFProgressHUD showHudInView:mainView mode:FTFHUDStyleCircle];
+    }
+
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [FTFProgressHUD hideHudInView:mainView];

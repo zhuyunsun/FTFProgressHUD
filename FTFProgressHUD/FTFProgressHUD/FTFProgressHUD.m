@@ -27,11 +27,13 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
     CGFloat width;
     CGFloat height;
     FTFHUDStyle currentMode;
+    UIView *backView;
     
     FTFSpotView *spointView;
     UIActivityIndicatorView *activityIndicator;
     FTFFireView *fireView;
     FTFBlinkView *blinkView;
+    FTFCircleView *circleView;
     
 }
 @end
@@ -52,6 +54,8 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
         currentView.userInteractionEnabled = NO;
         [self addSubview:currentView];
         
+        [self myBackView];
+        
         if (mode == FTFHUDStyleDefault) {
             [self createDefault];
         }
@@ -64,13 +68,16 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
         if (mode == FTFHUDStyleBlink) {
             [self createBall];
         }
+        if (mode == FTFHUDStyleCircle) {
+            [self createCircle];
+        }
 
     }
     return self;
 }
 
 +(instancetype)showHudInView:(UIView *)view mode:(FTFHUDStyle)mode{
-    FTFProgressHUDSDKVersion();
+    FTFProgressHUDSDKVersion(mode);
     FTFMainThreadAssert();
     FTFProgressHUD *hud = [[FTFProgressHUD alloc]initWithView:view mode:mode];
     hud.alpha = 0.01;
@@ -104,7 +111,9 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
     if (currentMode == FTFHUDStyleBlink) {
         [blinkView removeBlinkTimer];
     }
-
+    if (currentMode == FTFHUDStyleCircle) {
+        [circleView removeCurrentTimer];
+    }
 
     [UIView animateWithDuration:0.3 animations:^{
         hud.alpha = 0.01;
@@ -152,15 +161,14 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
        activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     }
     
-    UIView *backView = [self myBackView];
-    
     activityIndicator.center = CGPointMake(FTFSmallWidth() / 2, FTFSmallWidth() / 2);
     [backView addSubview:activityIndicator];
     
     [activityIndicator startAnimating];
 }
+//创建有圆角的四方框
 -(UIView *)myBackView{
-    UIView *backView = [[UIView alloc]init];
+    backView = [[UIView alloc]init];
     backView.frame = CGRectMake(0, 0, FTFSmallWidth(), FTFSmallWidth());
     backView.backgroundColor = [UIColor blackColor];
     backView.center = currentView.center;
@@ -177,7 +185,6 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
 
 #pragma mark FTFHUDStyleFire
 -(void)createFire{
-    UIView *backView = [self myBackView];
     CGRect r1 = CGRectMake(0, 0, backView.frame.size.width, backView.frame.size.height);
     fireView = [[FTFFireView alloc]initWithFrame:r1];
     [backView addSubview:fireView];
@@ -185,14 +192,18 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
 }
 #pragma mark FTFHUDStyleBlink
 -(void)createBall{
-    UIView *backView = [self myBackView];
-    
     //有规律的闪烁,还是随机闪烁
     CGFloat blinkWidth = backView.frame.size.width *0.8;
     CGRect r1 = CGRectMake(0, 0, blinkWidth, blinkWidth);
     blinkView = [[FTFBlinkView alloc]initWithFrame:r1];
     blinkView.center = CGPointMake(backView.frame.size.width / 2, backView.frame.size.width / 2);
     [backView addSubview:blinkView];
+}
+#pragma mark  FTFHUDStyleCircle
+-(void)createCircle{
+    CGRect r1 = CGRectMake(0, 0, backView.frame.size.width, backView.frame.size.height);
+    circleView = [[FTFCircleView alloc]initWithFrame:r1];
+    [backView addSubview:circleView];
 }
 @end
 
@@ -407,6 +418,7 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
 @end
 
 
+#pragma mark ===============
 
 @interface FTFBlinkView(){
     CGFloat width;
@@ -445,6 +457,10 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
         arrView = [[NSMutableArray alloc]init];
         arrDownView = [[NSMutableArray alloc]init];
         
+        //小圆点的颜色
+        UIColor *color = [UIColor grayColor];
+//        color = [UIColor whiteColor];
+        
         for (NSUInteger i = 0; i < count; i ++) {
             
             CGFloat y = middleHeight + (middleHeight + v1Height) *i;
@@ -452,8 +468,10 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
                 CGFloat x = middleHeight + (middleHeight + v1Height) *j;
                 UIView *v1 = [[UIView alloc]init];
                 v1.frame = CGRectMake(x, y, v1Height, v1Height);
-                v1.backgroundColor = [UIColor grayColor];
+                v1.backgroundColor = color;
                 v1.tag = 1000000 + index;
+                v1.layer.cornerRadius = v1Height / 2;
+                v1.clipsToBounds = YES;
                 [self addSubview:v1];
                 
                 if (index < 8) {
@@ -466,11 +484,13 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
                 if (i == 0 && j == 0) {
                     movingView = [[UIView alloc]init];
                     movingView.frame = v1.frame;
+                    movingView.layer.cornerRadius = v1Height / 2;
                     movingView.backgroundColor = [UIColor redColor];
                 }
                 if (i == (count - 1) && j == (count - 1)) {
                     downView = [[UIView alloc]init];
                     downView.frame = v1.frame;
+                    downView.layer.cornerRadius = v1Height / 2;
                     downView.backgroundColor = [UIColor blueColor];
                 }
 
@@ -485,7 +505,7 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
         currentIndex = 0;
         downIndex = 7;//下标
         //
-        val1 = 0.15;
+        val1 = 0.18;
         [self removeBlinkTimer];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             NSTimer *timer = [NSTimer timerWithTimeInterval:val1 target:self selector:@selector(blinkTimerAction) userInfo:nil repeats:YES];
@@ -599,5 +619,114 @@ UIKIT_STATIC_INLINE CGFloat FTFSmallWidth(){
 }
 - (void)dealloc{
     [self removeBlinkTimer];
+}
+@end
+
+#pragma mark ===============
+@interface FTFCircleView(){
+    CGFloat width;
+    CGFloat height;
+    
+    UIView *circle1;
+    UIView *circle2;
+    UIView *circle3;
+    
+    NSTimer *timer;
+    
+    UIColor *changeColor;
+    UIColor *c1Color;
+    NSUInteger currentIndex;
+    
+    UIColor *yellowColor;
+    UIColor *redColor;
+    UIColor *greenColor;
+    
+}
+@end
+@implementation FTFCircleView
+
+
+- (instancetype)initWithFrame:(CGRect)frame{
+    self = [super initWithFrame:frame];
+    if (self) {
+        
+        width = frame.size.width;
+        height = frame.size.height;
+        
+        changeColor = [UIColor whiteColor];
+        c1Color = [UIColor lightGrayColor];
+        
+        yellowColor = [UIColor yellowColor];
+        redColor = [UIColor redColor];
+        greenColor = [UIColor greenColor];
+        
+        CGFloat h1 = width *0.3;
+        circle1 = [self circleLineWidth:h1];
+        
+        
+        CGFloat h2 = width *0.6;
+        circle2 = [self circleLineWidth:h2];
+
+        CGFloat h3 = width *0.8;
+        circle3 = [self circleLineWidth:h3];
+
+        
+        currentIndex = 0;
+        circle1.layer.borderColor = [redColor CGColor];
+        circle2.layer.borderColor = [yellowColor CGColor];
+        circle3.layer.borderColor = [greenColor CGColor];
+        NSTimeInterval val1 = 0.2;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            timer = [NSTimer timerWithTimeInterval:val1 target:self selector:@selector(circleTimerAction) userInfo:nil repeats:YES];
+            [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+            [timer fire];
+
+        });
+        
+        
+    }
+    return self;
+}
+//红 黄 绿
+-(void)circleTimerAction{
+    if (currentIndex == 0) {
+        circle1.layer.borderColor = [yellowColor CGColor];
+        circle2.layer.borderColor = [greenColor CGColor];
+        circle3.layer.borderColor = [redColor CGColor];
+        currentIndex = 1;
+    }else if(currentIndex == 1){
+        circle1.layer.borderColor = [greenColor CGColor];
+        circle2.layer.borderColor = [redColor CGColor];
+        circle3.layer.borderColor = [yellowColor CGColor];
+        currentIndex = 2;
+    }else{
+        circle1.layer.borderColor = [redColor CGColor];
+        circle2.layer.borderColor = [yellowColor CGColor];
+        circle3.layer.borderColor = [greenColor CGColor];
+        currentIndex = 0;
+    }
+    
+    
+}
+-(void)removeCurrentTimer{
+    [timer invalidate];
+    timer = nil;
+}
+-(void)dealloc{
+    [self removeCurrentTimer];
+}
+-(UIView *)circleLineWidth:(CGFloat)v1Height{
+    CGPoint center = self.center;
+    
+    UIView *v1 = [[UIView alloc]init];
+    v1.frame = CGRectMake(0, 0, v1Height, v1Height);
+    v1.clipsToBounds = YES;
+    v1.layer.cornerRadius = v1Height / 2;
+    v1.layer.borderColor = [c1Color CGColor];
+    v1.layer.borderWidth = 1.3f;
+    v1.backgroundColor = [UIColor clearColor];
+    v1.center = center;
+    [self addSubview:v1];
+    return v1;
 }
 @end

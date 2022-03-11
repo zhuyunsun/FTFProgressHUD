@@ -8,18 +8,21 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
-UIKIT_STATIC_INLINE NSString* FTFProgressHUDSDKVersion(){
-    NSString *FTFProgressHUDSDKVersionStr = @"1.0.0";
-    NSLog(@"FTFProgressHUDSDKVersion:12.31 = %@",FTFProgressHUDSDKVersionStr);
-    return FTFProgressHUDSDKVersionStr;
-}
 
 typedef NS_ENUM(NSUInteger,FTFHUDStyle){
     FTFHUDStyleDefault = 1,
     FTFHUDStyleSpot,
     FTFHUDStyleFire,
-    FTFHUDStyleBlink
+    FTFHUDStyleBlink,
+    FTFHUDStyleCircle  //红黄绿 三种颜色
+                       //波纹效果
 };
+UIKIT_STATIC_INLINE NSString* FTFProgressHUDSDKVersion(FTFHUDStyle state){
+    NSString *FTFProgressHUDSDKVersionStr = @"1.0.0";
+    NSLog(@"FTFProgressHUDSDKVersion:12.31 = %@,类型:%ld",FTFProgressHUDSDKVersionStr,state);
+    return FTFProgressHUDSDKVersionStr;
+}
+
 @interface FTFProgressHUD : UIView
 -(instancetype)init NS_UNAVAILABLE;
 +(instancetype)new NS_UNAVAILABLE;
@@ -49,5 +52,7 @@ typedef NS_ENUM(NSUInteger,FTFHUDStyle){
 @end
 
 
-
+@interface FTFCircleView : UIView
+-(void)removeCurrentTimer;
+@end
 NS_ASSUME_NONNULL_END

@@ -307,6 +307,7 @@
 				DEVELOPMENT_TEAM = G6WJ4DK4A4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FTFProgressHUD/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HUD;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -338,6 +339,7 @@
 				DEVELOPMENT_TEAM = G6WJ4DK4A4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FTFProgressHUD/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HUD;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
